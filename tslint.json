@@ -17,6 +17,7 @@
     "no-consecutive-blank-lines": false,
     "arrow-parens": false,
     "one-variable-per-declaration": false,
-    "trailing-comma": false
+    "trailing-comma": false,
+    "variable-name": [ true, "ban-keywords", "check-format", "allow-leading-underscore" ]
   }
 }

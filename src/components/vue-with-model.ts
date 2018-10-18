@@ -1,9 +1,8 @@
 import Vue from "vue";
 import { Prop } from "vue-property-decorator";
-import { Nullable } from "./interfaces";
 import { Mixin } from "vue-mixin-decorator";
 
-interface InputKeyboardEvent extends KeyboardEvent {
+interface InputEvent extends KeyboardEvent {
   target: HTMLInputElement;
 }
 
@@ -14,15 +13,25 @@ function getValueFrom(el: HTMLInputElement) {
 @Mixin
 export class VueWithModel extends Vue {
   @Prop({ default: null })
-  public value!: Nullable<string>;
-  public onInput(e: InputKeyboardEvent) {
+  public value!: any; // **
+
+  private _onInput!: EventListenerObject;
+
+  public onInput(e: InputEvent) {
     if (!e || !e.target) {
       return;
     }
     this.$emit("input", getValueFrom(e.target));
   }
 
-  public created() {
-      this.$on("input", this.onInput.bind(this));
+  public mounted() {
+      this._onInput = this.onInput.bind(this);
+      this.$el.addEventListener("input", this._onInput);
+  }
+  public beforeDestroy() {
+      this.$el.removeEventListener("input", this._onInput);
   }
 }
+
+// ** I'd prefer to make VueWithModel generic (ie VueWithModel<T>) but
+//      then it doesn't play nicely with the Mixins decorator
